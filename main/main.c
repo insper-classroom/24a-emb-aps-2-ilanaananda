@@ -13,18 +13,22 @@
 #include <math.h>
 #include <stdlib.h>
 
-const int BTN_Confirm = 0; // z or enter
-const int BTN_Cancel = 1; // x or shift
-const int BTN_Menu = 2; // c or ctrl
-const int BTN_Fullscreen = 3; // f4
-const int BTN_Quit = 4; // hold esc
-const int BTN_OnOff = 5; // power control
+const int BTN_Confirm = 2; // z or enter
+const int BTN_Cancel = 3; // x or shift
+const int BTN_Menu = 4; // c or ctrl
+const int BTN_Fullscreen = 5; // f4
+const int BTN_Quit = 6; // hold esc
+const int BTN_Quit = 7; // extra
 
-const int LED_Connected = 6; // bluetooth connected
+// hc-06
+const int HC_TX = 8;
+const int HC_RX = 9;
 
-#define JOY_X_PIN 26
-#define JOY_Y_PIN 27
-#define DEAD_ZONE 30
+const int LED_Connected = 10; // bluetooth connected
+
+const int JOY_X_PIN = 26;
+const int JOY_Y_PIN = 27;
+const int DEAD_ZONE = 30;
 
 QueueHandle_t xQueueAdc;
 QueueHandle_t xQueueBTN;
@@ -46,8 +50,6 @@ void button_callback(uint gpio, uint32_t events) {
         pressed_btn = BTN_Fullscreen;
     } else if (gpio == BTN_Quit && events == GPIO_IRQ_EDGE_FALL) {
         pressed_btn = BTN_Quit;
-    } else if (gpio == BTN_OnOff && events == GPIO_IRQ_EDGE_FALL) {
-        pressed_btn = BTN_OnOff;
     }
     xQueueSendFromISR(xQueueBTN, &pressed_btn, NULL);
 }
@@ -104,6 +106,15 @@ void uart_task(void *p) {
         uart_putc_raw(uart0, lsb);
         uart_putc_raw(uart0, msb);
         uart_putc_raw(uart0, -1);
+    }
+}
+
+void select_output(void){
+    int pressed_btn = 0;
+    if(xQueueReceiveFromISR(xQueueBTN, &pressed_btn, portMAX_DELAY) == pdTRUE){
+        if(pressed_btn == BTN_Confirm){
+
+        }
     }
 }
 
